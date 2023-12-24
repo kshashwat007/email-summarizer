@@ -115,22 +115,6 @@ export async function GET(request: NextRequest) {
     summaries.map((summary) => {
       summaryList.push(JSON.parse(summary))
     })
-    // const summaryDetails: {}[] = []
-    // summaries.map((summary: any) => {
-    //   let parsedObject = JSON.parse(summary)
-    //   let fullDetail = {}
-    //   let seperateObject = Object.keys(parsedObject).map(key => {
-    //     return {[key]: parsedObject[key]}
-    //   })
-    //   fullDetail["summary"] = summary["summary"]
-    //   fullDetail["links"] = summary["links"]
-    //   fullDetail["actionItems"] = summary["action_items"]
-    //   summaryDetails.push(fullDetail)
-    //   console.log(summaryDetails)
-    // })
-    // const summariesFormatted = JSON.stringify(summaries, null, 2)
-    
-    // console.log("Emails", emails)
     return Response.json({emails: emails, summaries: summaries, summaryDetails: summaryList})
 } catch (error) {
     console.error(error);
