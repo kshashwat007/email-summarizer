@@ -16,10 +16,12 @@ const EmailSummary = ({ email }) => {
       <div className="divider"></div>
       {email.action_items && email.action_items.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase">Action Items (showing 2)</h3>
-          <ul className="list-disc pl-4 space-y-2">
-            {email.action_items.slice(0, 2).map((item, index) => (
-              <li key={index} className="text-xs text-gray-600">{item}</li>
+          <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase">Action Items (showing 1)</h3>
+          <ul className="list-disc pl-4 pr-4 space-y-2"> {/* Adjusted right padding */}
+            {email.action_items.slice(0, 1).map((item, index) => (
+              <li key={index} className="text-xs text-gray-600 break-all">
+                {item}
+              </li>
             ))}
           </ul>
         </div>
@@ -27,11 +29,11 @@ const EmailSummary = ({ email }) => {
 
       {email.links && email.links.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase">Extracted Links (showing 2)</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase">Extracted Links (showing 1)</h3>
           <ul className="list-disc pl-4 space-y-2">
-            {email.links.slice(0, 2).map((item, index) => (
+            {email.links.slice(0, 1).map((item, index) => (
               <li key={index} className="text-xs text-gray-600">
-                <a href={item} target="_blank" rel="noopener noreferrer">{item}</a>
+                <a href={item} className="break-all" target="_blank" rel="noopener noreferrer">{item}</a>
               </li>
             ))}
           </ul>
@@ -56,7 +58,7 @@ const SummaryFeed = ({ emails }) => {
     <div className="flex h-screen">
       <Sidebar />
       <div className="flex-grow overflow-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6 p-6">
           {emails.map(email => <EmailSummary key={email.id} email={email} />)}
         </div>
       </div>
