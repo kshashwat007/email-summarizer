@@ -1,6 +1,6 @@
 const Sidebar = () => {
   return (
-    <div className="w-1/6 h-full bg-[#fafafa] border-r-2 mt-4">
+    <div className="sticky top-0 w-1/6 h-screen bg-[#fafafa] border-r-2 overflow-y-auto">
       <ul className="menu w-full">
          <li>
             <a>

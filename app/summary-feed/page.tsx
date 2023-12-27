@@ -56,7 +56,7 @@ const EmailSummary = ({ email }) => {
 const SummaryFeed = ({ emails }) => {
   return (
     <div className="flex h-screen bg-[#F5F7FA]">
-      <Sidebar />
+      
       <div className="flex-grow overflow-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 p-6">
           {emails.map(email => <EmailSummary key={email.id} email={email} />)}
