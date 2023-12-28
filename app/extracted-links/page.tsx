@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ActionItemsSidebar = ({ actionItems }) => {
+const ExtractedLinks = () => {
   return (
     <div className="flex w-full bg-[#F5F7FA]">
       
@@ -8,4 +8,4 @@ const ActionItemsSidebar = ({ actionItems }) => {
   );
 };
 
-export default ActionItemsSidebar;
+export default ExtractedLinks;

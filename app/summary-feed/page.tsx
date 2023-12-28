@@ -1,8 +1,19 @@
 'use client'
 import Sidebar from '@/components/Sidebar';
 import React, { useState } from 'react';
+import data from '../../testdata.json'
+import {Routes, Route, useNavigate} from 'react-router-dom';
+import SummaryData from '../summary-data/[id]/page';
+import { useRouter } from 'next/navigation';
 
 const EmailSummary = ({ email }) => {
+  const router = useRouter();
+
+  const openSummary = () => {
+    // Here we navigate to the summary page and pass the email ID as a query parameter
+    router.push('/summary-data/1');
+  };
+
   return (
     <div className="card bg-[#FFFFFF] p-6 mt-3 w-full max-w-md lg:max-w-lg xl:max-w-xl shadow-md rounded-xl overflow-hidden border border-[#d5e3f9]">
       <div className="flex justify-between items-start mb-4">
@@ -41,7 +52,7 @@ const EmailSummary = ({ email }) => {
       )}
 
       <div className="mt-4">
-        <button className="text-[#5e7fc5] hover:text-blue-700 flex items-center transition-colors duration-200">
+        <button className="text-[#5e7fc5] hover:text-blue-700 flex items-center transition-colors duration-200" onClick={openSummary}>
           Open Summary
           <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -53,7 +64,9 @@ const EmailSummary = ({ email }) => {
 };
 
 
-const SummaryFeed = ({ emails }) => {
+const SummaryFeed = () => {
+  const emails = data.summaryDetails
+
   return (
     <div className="flex h-screen bg-[#F5F7FA]">
       <div className="flex-grow overflow-auto">

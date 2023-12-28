@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </head>
       )}
       <body>
-        <div className="flex h-screen pl-1/6">
+        <div className="flex h-screen">
           <Sidebar />
           <ClientLayout>{children}</ClientLayout>
         </div>
