@@ -8,7 +8,6 @@ import Sidebar from "@/components/Sidebar";
 export default function Page() {
   return (
     <div className="flex h-screen pl-1/6">
-      <Sidebar />
       <SummaryFeed emails={data.summaryDetails} />
     </div>
   );

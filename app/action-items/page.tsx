@@ -11,9 +11,8 @@ const ActionItem = ({ item }) => {
 
 const ActionItemsSidebar = ({ actionItems }) => {
   return (
-    <div className="p-4">
-      <h4 className="font-semibold mb-2">Action Items</h4>
-      {actionItems.map(item => <ActionItem key={item.id} item={item} />)}
+    <div>
+      <h1>action items</h1>
     </div>
   );
 };
