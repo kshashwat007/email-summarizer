@@ -17,11 +17,15 @@ async function authenticate() {
   return oAuth2Client;
 }
 
-function getPlainTextBody(message) {
+function getPlainTextBody(message: { payload: {
+  headers: any; parts: any[]; body: { data: string; }; 
+}; }) {
   // Emails may be multipart, check the payload parts
   const parts = message.payload.parts || [];
   let plainTextBody = "";
-
+  const sender = message.payload.headers.find((obj) => obj.name == "From").value
+  const subject = message.payload.headers.find((obj) => obj.name == "Subject").value
+  const date = message.payload.headers.find((obj) => obj.name == "Date").value
   for (const part of parts) {
       if (part.mimeType === 'text/plain') {
           plainTextBody = part.body.data;
@@ -34,10 +38,16 @@ function getPlainTextBody(message) {
       plainTextBody = message.payload.body.data;
   }
 
-  return plainTextBody;
+  const data = {
+    plainTextBody,
+    sender,
+    subject,
+    date
+  }
+  return data;
 }
 
-function decodeBase64Url(encodedStr) {
+function decodeBase64Url(encodedStr: string) {
   // Replace URL-safe characters
   const base64String = encodedStr.replace(/\-/g, '+').replace(/_/g, '/');
   // Base64 decode
@@ -54,12 +64,25 @@ async function fetchUnreadEmails(auth: any) {
       userId: 'me',
       q: `is:unread after:${oneWeekAgo.toISOString().split('T')[0]}`,
   });
-
+  
   const fullEmails = await Promise.all(response.data.messages.map((msg: { id: any; }) => getEmailContent(msg.id, auth)));
-
+  // console.log("Email list", fullEmails)
+  
   const emailBodies = fullEmails.map(email => {
-    const encodedBody = getPlainTextBody(email);
-    return decodeBase64Url(encodedBody);
+    const encodedBodyData = getPlainTextBody(email);
+    const encodedBody = encodedBodyData.plainTextBody
+
+    const decodedBody = decodeBase64Url(encodedBody);
+    const sender = encodedBodyData.sender
+    const subject = encodedBodyData.subject
+    const date = encodedBodyData.date
+    const resData = {
+      decodedBody,
+      sender,
+      subject,
+      date
+    }
+    return resData
   });
 
   // console.log("Email", fullEmails)
@@ -70,29 +93,57 @@ async function getSummaries(fullEmails: any) {
   const emailSummaries = await Promise.all(
     fullEmails.map(async (email: any) => {
       
-      const summary = await summarizeEmail(email)
-      return summary
+      const sender = email.sender
+      const subject = email.subject
+      const date = email.date
+
+      const summary = await summarizeEmail(email.decodedBody)
+      const resData = {
+        summary,
+        sender,
+        subject,
+        date
+      }
+      return resData
     })
   )
 
   // const emailSummaries = await summarizeEmail(fullEmails)
-
+  
   return emailSummaries
 }
-async function getEmailContent(messageId, auth) {
+
+async function getEmailContent(messageId: any, auth: any) {
   const gmail = google.gmail({ version: 'v1', auth });
   const emailResponse = await gmail.users.messages.get({
       userId: 'me',
       id: messageId,
   });
 
+  // console.log("Headers", emailResponse.data.payload.headers)
+  const sender = emailResponse.data.payload.headers.find((obj) => obj.name == "From").value
+  const subject = emailResponse.data.payload.headers.find((obj) => obj.name == "Subject").value
+  const date = emailResponse.data.payload.headers.find((obj) => obj.name == "Date").value
+  // const sender = emailResponse?.payload?.headers[0]?.value
+  // const subject = emailResponse?.payload?.headers[1]?.value
+  // const date_mil = parseInt(emailResponse['internalDate'])
+
+  // const dateFormatted = new Date(date_mil).toLocaleString(); // Adjust the format as needed
+
+  const data = {
+    emailResponseData: emailResponse.data,
+    sender,
+    subject,
+    date
+  }
+  // console.log("Data",data)
   return emailResponse.data;
 }
 
 async function summarizeEmail(emailBody: String) {
   try {
     const completion = await openai.chat.completions.create({
-      messages: [{"role": "system", "content": "You are a helpful assistant which summarizes emails based on the email body provided. For each body, get the links in it, summarize the email, if any action items provide that. I should know what the email is all about. Output should be in json and it should be beautified with no slashes and proper readable format. The keys will be different sections such as summary, links, action items etc."},
+      messages: [{"role": "system", "content": "You are a helpful assistant which summarizes emails based on the email body provided. For each body, get the links in it, summarize the email, if any action items provide that. I should know what the email is all about. Output should be in json and it should be beautified with no slashes and proper readable format. The keys will be different sections such as summary, links, action items etc. The keys name should be summary,links,action_items"},
           {"role": "user", "content": `This is the email body. ${emailBody}`}],
       model: "gpt-3.5-turbo-1106",
       response_format: { type: "json_object" }
@@ -113,7 +164,11 @@ export async function GET(request: NextRequest) {
     const summaries = await getSummaries(emails)
     let summaryList: any[] = []
     summaries.map((summary) => {
-      summaryList.push(JSON.parse(summary))
+      let summaryObj = JSON.parse(summary.summary)
+      summaryObj['sender'] = summary.sender
+      summaryObj['subject'] = summary.subject
+      summaryObj['date'] = summary.date
+      summaryList.push(summaryObj)
     })
     return Response.json({emails: emails, summaries: summaries, summaryDetails: summaryList})
 } catch (error) {
