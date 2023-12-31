@@ -1,6 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 const { google } = require('googleapis');
 import OpenAI from "openai";
+import Summary from "@/models/Summary";
+import connectMongo from "@/libs/mongoose";
 
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
@@ -159,16 +161,18 @@ async function summarizeEmail(emailBody: String) {
 export async function GET(request: NextRequest) {
   try {
     console.log("GET Emails route")
+    await connectMongo();
     const auth = await authenticate();
     const emails = await fetchUnreadEmails(auth);
     const summaries = await getSummaries(emails)
     let summaryList: any[] = []
-    summaries.map((summary) => {
+    summaries.map(async (summary) => {
       let summaryObj = JSON.parse(summary.summary)
       summaryObj['sender'] = summary.sender
       summaryObj['subject'] = summary.subject
       summaryObj['date'] = summary.date
       summaryList.push(summaryObj)
+      await Summary.create(summaryObj)
     })
     return Response.json({emails: emails, summaries: summaries, summaryDetails: summaryList})
 } catch (error) {

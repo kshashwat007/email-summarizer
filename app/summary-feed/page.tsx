@@ -1,10 +1,12 @@
-'use client'
+"use client"
 import Sidebar from '@/components/Sidebar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import data from '../../testdata.json'
 import {Routes, Route, useNavigate} from 'react-router-dom';
 import SummaryData from '../summary-data/[id]/page';
 import { useRouter } from 'next/navigation';
+import Summary from '@/models/Summary';
+import connectMongo from '@/libs/mongoose';
 
 const EmailSummary = ({ email }) => {
   const router = useRouter();
@@ -29,7 +31,7 @@ const EmailSummary = ({ email }) => {
         <div>
           <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase">Action Items</h3>
           <ul className="list-disc pl-4 pr-4 space-y-2"> {/* Adjusted right padding */}
-            {email.action_items.slice(0, 1).map((item, index) => (
+            {email.action_items.slice(0, 1).map((item: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode, index: React.Key) => (
               <li key={index} className="text-xs text-gray-600 break-all">
                 {item}
               </li>
@@ -42,7 +44,7 @@ const EmailSummary = ({ email }) => {
         <div className="mt-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase">Extracted Links</h3>
           <ul className="list-disc pl-4 space-y-2">
-            {email.links.slice(0, 1).map((item, index) => (
+            {email.links.slice(0, 1).map((item: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.PromiseLikeOfReactNode, index: React.Key) => (
               <li key={index} className="text-xs text-gray-600">
                 <a href={item} className="break-all" target="_blank" rel="noopener noreferrer">{item}</a>
               </li>
@@ -65,13 +67,43 @@ const EmailSummary = ({ email }) => {
 
 
 const SummaryFeed = () => {
-  const emails = data.summaryDetails
+  const [summaries, setSummaries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/summary')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Data", data.summaries)
+        setSummaries(data.summaries);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        setError(error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div className="flex h-screen bg-[#F5F7FA]">
       <div className="flex-grow overflow-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 p-6">
-          {emails.map(email => <EmailSummary key={email.id} email={email} />)}
+          {summaries.map((summary) => <EmailSummary key={summary._id} email={summary} />)}
         </div>
       </div>
     </div>
