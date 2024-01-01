@@ -12,8 +12,9 @@ const EmailSummary = ({ email }) => {
   const router = useRouter();
 
   const openSummary = () => {
+    console.log("ID",email)
     // Here we navigate to the summary page and pass the email ID as a query parameter
-    router.push('/summary-data/1');
+    router.push(`/summary-data/${email.id}`);
   };
 
   return (
@@ -72,7 +73,7 @@ const SummaryFeed = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/summary')
+    fetch('http://localhost:3000/api/summaries')
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');

@@ -8,11 +8,8 @@ import connectMongo from "@/libs/mongoose";
 export async function GET(request: NextRequest) {
   try {
     await connectMongo();
-    const url = new URL(request.url)
-
-    const id = url.searchParams.get("id")
-    const fetchedSummary = await Summary.findOne({ _id: id });
-    return Response.json(fetchedSummary)
+    const fetchedSummaries = await Summary.find({});
+    return Response.json({summaries: fetchedSummaries})
 } catch (error) {
     console.error(error);
     return Response.json({error: error})
