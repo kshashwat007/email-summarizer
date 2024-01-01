@@ -7,6 +7,10 @@ import ClientLayout from "@/components/LayoutClient";
 import config from "@/config";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+import { SessionProvider } from 'next-auth/react';
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/next-auth";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -21,7 +25,13 @@ export const viewport: Viewport = {
 // You can override them in each page passing params to getSOTags() function.
 export const metadata = getSEOTags();
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect(config.auth.loginUrl);
+  }
+
   return (
     <html lang="en" data-theme={config.colors.theme} className={font.className}>
       {config.domainName && (

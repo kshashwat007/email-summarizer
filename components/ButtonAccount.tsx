@@ -17,7 +17,7 @@ const ButtonAccount = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSignOut = () => {
-    signOut({ callbackUrl: "/" });
+    signOut({ callbackUrl: "/api/auth/signin" });
   };
   const handleBilling = async () => {
     setIsLoading(true);

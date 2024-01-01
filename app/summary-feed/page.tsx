@@ -7,12 +7,12 @@ import SummaryData from '../summary-data/[id]/page';
 import { useRouter } from 'next/navigation';
 import Summary from '@/models/Summary';
 import connectMongo from '@/libs/mongoose';
+import ButtonAccount from '@/components/ButtonAccount';
 
 const EmailSummary = ({ email }) => {
   const router = useRouter();
 
   const openSummary = () => {
-    console.log("ID",email)
     // Here we navigate to the summary page and pass the email ID as a query parameter
     router.push(`/summary-data/${email.id}`);
   };
@@ -103,6 +103,10 @@ const SummaryFeed = () => {
   return (
     <div className="flex h-screen bg-[#F5F7FA]">
       <div className="flex-grow overflow-auto">
+        <div className='p-6'>
+          <ButtonAccount />
+        </div>
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 p-6">
           {summaries.map((summary) => <EmailSummary key={summary._id} email={summary} />)}
         </div>
