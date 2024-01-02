@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
     console.log("Session", session)
     const user = await User.findById(session.user.id);
-    console.log("User", user)
-    const fetchedSummaries = await Summary.find({});
+    console.log("User", String(user._id))
+    const fetchedSummaries = await Summary.find({userID: String(user._id)});
     return Response.json({summaries: fetchedSummaries})
 } catch (error) {
     console.error(error);

@@ -3,28 +3,32 @@ import toJSON from "./plugins/toJSON";
 
 
 const summarySchema = new mongoose.Schema({
-  summary: {
+    summary: {
       type: String,
       required: true
-  },
-  links: [{
-      type: String
-  }],
-  action_items: [{
-      type: String
-  }],
-  sender: {
-      type: String,
-      required: true
-  },
-  subject: {
-      type: String,
-      required: true
-  },
-  date: {
-      type: Date,
-      required: true
-  }
+    },
+    userID: {
+        type: String,
+        required: true
+    },
+    links: [{
+        type: String
+    }],
+    action_items: [{
+        type: String
+    }],
+    sender: {
+        type: String,
+        required: true
+    },
+    subject: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
+    }
 });
 
 // add plugin that converts mongoose to json
