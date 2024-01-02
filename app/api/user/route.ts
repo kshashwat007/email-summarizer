@@ -13,8 +13,12 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
     console.log("Session", session)
     const user = await User.findById(session.user.id);
-    const fetchedSummaries = await Summary.find({userID: String(user._id)});
-    return Response.json({summaries: fetchedSummaries})
+    if (user) {
+      user.accessToken = session.user.accessToken
+      user.refreshToken = session.user.refreshToken
+      user.save()
+    }
+    return Response.json({"Sucess": "User updated"})
 } catch (error) {
     console.error(error);
     return Response.json({error: error})

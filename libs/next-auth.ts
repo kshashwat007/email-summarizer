@@ -5,6 +5,7 @@ import EmailProvider from "next-auth/providers/email";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import config from "@/config";
 import connectMongo from "./mongo";
+import User from "@/models/User";
 
 interface NextAuthOptionsExtended extends NextAuthOptions {
   adapter: any;
@@ -18,6 +19,13 @@ export const authOptions: NextAuthOptionsExtended = {
       // Follow the "Login with Google" tutorial to get your credentials
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
+      authorization: {
+        params: {
+          access_type: 'offline',
+          prompt: 'consent', // Force the consent screen to ensure a refresh token is returned
+          scope: "https://mail.google.com/ openid email profile",
+        },
+      },
       async profile(profile) {
         return {
           id: profile.sub,
@@ -38,9 +46,20 @@ export const authOptions: NextAuthOptionsExtended = {
   ...(connectMongo && { adapter: MongoDBAdapter(connectMongo) }),
 
   callbacks: {
+    async jwt({ token, account }) {
+      // Handle access token and refresh token here
+      if (account) {
+        console.log("Account", account)
+        token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+      }
+      return token;
+    },
     session: async ({ session, token }) => {
       if (session?.user) {
         session.user.id = token.sub;
+        session.user.accessToken = token.accessToken;
+        session.user.refreshToken = token.refreshToken;
       }
       return session;
     },

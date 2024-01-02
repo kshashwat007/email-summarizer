@@ -3,17 +3,21 @@ const { google } = require('googleapis');
 import OpenAI from "openai";
 import Summary from "@/models/Summary";
 import connectMongo from "@/libs/mongoose";
+import { authOptions } from "@/libs/next-auth";
+import User from "@/models/User";
+import { getServerSession } from "next-auth";
 
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
-async function authenticate() {
+async function authenticate(refreshToken: String) {
   const oAuth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_ID,
       process.env.GOOGLE_SECRET
   );
-
+  
+  console.log("Refresh token", refreshToken)
   oAuth2Client.setCredentials({
-      refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+      refresh_token: refreshToken,
   });
 
   return oAuth2Client;
@@ -64,7 +68,8 @@ async function fetchUnreadEmails(auth: any) {
 
   const response = await gmail.users.messages.list({
       userId: 'me',
-      q: `is:unread after:${oneWeekAgo.toISOString().split('T')[0]}`,
+      q: `in:inbox is:unread after:${oneWeekAgo.toISOString().split('T')[0]}`,
+      maxResults: 10,
   });
   
   const fullEmails = await Promise.all(response.data.messages.map((msg: { id: any; }) => getEmailContent(msg.id, auth)));
@@ -162,15 +167,20 @@ export async function GET(request: NextRequest) {
   try {
     console.log("GET Emails route")
     await connectMongo();
-    const auth = await authenticate();
+    const session = await getServerSession(authOptions);
+    console.log("Session", session)
+    const user = await User.findById(session.user.id);
+    const auth = await authenticate(session.user.refreshToken);
     const emails = await fetchUnreadEmails(auth);
     const summaries = await getSummaries(emails)
+    
     let summaryList: any[] = []
     summaries.map(async (summary) => {
       let summaryObj = JSON.parse(summary.summary)
       summaryObj['sender'] = summary.sender
       summaryObj['subject'] = summary.subject
       summaryObj['date'] = summary.date
+      summaryObj['userID'] = String(user._id)
       summaryList.push(summaryObj)
       await Summary.create(summaryObj)
     })

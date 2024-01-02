@@ -90,6 +90,19 @@ const SummaryFeed = () => {
         setError(error);
         setLoading(false);
       });
+    fetch('http://localhost:3000/api/user')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Data", data)
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
   }, []);
 
   if (loading) {

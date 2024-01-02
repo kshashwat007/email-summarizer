@@ -14,6 +14,12 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       private: true,
     },
+    accessToken: {
+      type: String,
+    },
+    refreshToken: {
+      type: String
+    },
     image: {
       type: String,
     },
