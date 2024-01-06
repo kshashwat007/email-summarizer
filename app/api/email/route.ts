@@ -68,7 +68,7 @@ async function fetchUnreadEmails(auth: any) {
 
   const response = await gmail.users.messages.list({
       userId: 'me',
-      q: `in:inbox is:unread after:${oneWeekAgo.toISOString().split('T')[0]}`,
+      q: `is:unread in:inbox in:primary after:${oneWeekAgo.toISOString().split('T')[0]}`,
       maxResults: 10,
   });
   
