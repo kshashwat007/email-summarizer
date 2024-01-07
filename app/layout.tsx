@@ -41,7 +41,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       )}
       <body>
         <div className="flex h-screen">
-          <Sidebar />
+          {/* <Sidebar /> */}
           <ClientLayout>{children}</ClientLayout>
         </div>
         {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
