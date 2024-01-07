@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptionsExtended = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      return `${process.env.NEXTAUTH_URL}/`
+      return `${process.env.NEXTAUTH_URL}/dashboard`
     }
   },
   session: {
