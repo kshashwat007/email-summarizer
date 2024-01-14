@@ -6,8 +6,31 @@ import connectMongo from "@/libs/mongoose";
 import { authOptions } from "@/libs/next-auth";
 import User from "@/models/User";
 import { getServerSession } from "next-auth";
+import Bee from 'bee-queue';
+const { Queue, Worker } = require('bullmq')
+import { createClient } from 'redis';
+
+const Redis = require('ioredis');
+
+const redisConfig = {
+  port: 6379,
+  host: '127.0.0.1',
+};
+
+const redisConnection = new Redis(redisConfig);
+// const redis = new Redis({
+//   host: "127.0.0.1",
+//   port: 6379,
+//   username: "krishusername",
+//   password: 'krishpassword'
+// });
+
 
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
+
+const emailSummarizationQueue = new Queue('emailSummarizer', {
+  connection: redisConnection
+});
 
 async function authenticate(refreshToken: String) {
   const oAuth2Client = new google.auth.OAuth2(
@@ -15,7 +38,7 @@ async function authenticate(refreshToken: String) {
       process.env.GOOGLE_SECRET
   );
   
-  console.log("Refresh token", refreshToken)
+  // console.log("Refresh token", refreshToken)
   oAuth2Client.setCredentials({
       refresh_token: refreshToken,
   });
@@ -68,10 +91,9 @@ async function fetchUnreadEmails(auth: any) {
 
   const response = await gmail.users.messages.list({
       userId: 'me',
-      q: `is:unread in:inbox in:primary after:${oneWeekAgo.toISOString().split('T')[0]}`,
-      maxResults: 10,
+      q: `is:unread after:${oneWeekAgo.toISOString().split('T')[0]}`,
   });
-  
+  // console.log("RES", response)
   const fullEmails = await Promise.all(response.data.messages.map((msg: { id: any; }) => getEmailContent(msg.id, auth)));
   // console.log("Email list", fullEmails)
   
@@ -127,27 +149,11 @@ async function getEmailContent(messageId: any, auth: any) {
       id: messageId,
   });
 
-  // console.log("Headers", emailResponse.data.payload.headers)
-  const sender = emailResponse.data.payload.headers.find((obj) => obj.name == "From").value
-  const subject = emailResponse.data.payload.headers.find((obj) => obj.name == "Subject").value
-  const date = emailResponse.data.payload.headers.find((obj) => obj.name == "Date").value
-  // const sender = emailResponse?.payload?.headers[0]?.value
-  // const subject = emailResponse?.payload?.headers[1]?.value
-  // const date_mil = parseInt(emailResponse['internalDate'])
-
-  // const dateFormatted = new Date(date_mil).toLocaleString(); // Adjust the format as needed
-
-  const data = {
-    emailResponseData: emailResponse.data,
-    sender,
-    subject,
-    date
-  }
-  // console.log("Data",data)
+  
   return emailResponse.data;
 }
 
-async function summarizeEmail(emailBody: String) {
+export async function summarizeEmail(emailBody: String) {
   try {
     const completion = await openai.chat.completions.create({
       messages: [{"role": "system", "content": "You are a helpful assistant which summarizes emails based on the email body provided. For each body, get the links in it, summarize the email, if any action items provide that. I should know what the email is all about. Output should be in json and it should be beautified with no slashes and proper readable format. The keys will be different sections such as summary, links, action items etc. The keys name should be summary,links,action_items"},
@@ -163,30 +169,56 @@ async function summarizeEmail(emailBody: String) {
   }
 }
 
+// const emailSummarizationQueue = new Bee('emailSummarizationQueue');
+
+
+
 export async function GET(request: NextRequest) {
   try {
-    console.log("GET Emails route")
     await connectMongo();
-    const session = await getServerSession(authOptions);
-    console.log("Session", session)
-    const user = await User.findById(session.user.id);
-    const auth = await authenticate(session.user.refreshToken);
-    const emails = await fetchUnreadEmails(auth);
-    const summaries = await getSummaries(emails)
     
-    let summaryList: any[] = []
-    summaries.map(async (summary) => {
-      let summaryObj = JSON.parse(summary.summary)
-      summaryObj['sender'] = summary.sender
-      summaryObj['subject'] = summary.subject
-      summaryObj['date'] = summary.date
-      summaryObj['userID'] = String(user._id)
-      summaryList.push(summaryObj)
-      await Summary.create(summaryObj)
-    })
-    return Response.json({emails: emails, summaries: summaries, summaryDetails: summaryList})
+    // const session = await getServerSession(authOptions);
+    // console.log("Session", session)
+    // console.log("Connected", emailSummarizationQueue)
+    const users = await User.find({});
+    users.forEach(async (userObj) => {
+      // Access user properties and perform actions
+      const user = await User.findById(userObj._id);
+      const auth = await authenticate(userObj.refreshToken);
+      const emails = await fetchUnreadEmails(auth);
+      // console.log("EMAILS", emails)
+      let enqueuedJobs = emails.map(async (email) => {
+        return await emailSummarizationQueue.add("emailSummarizer",{
+          userId: user._id,
+          emailContent: email.decodedBody,
+          sender: email.sender,
+          subject: email.subject,
+          date: email.date,
+        });
+        // return await emailSummarizationQueue.add("emailSummarizationQueue", { foo: 'bar' })
+      });
+      await Promise.all(enqueuedJobs);
+    });
+    
+    const counts = await emailSummarizationQueue.getJobCounts('wait', 'completed', 'failed');
+    console.log("Done", counts)
+    // emailSummarizationQueue.obliterate()
+    return Response.json({ message: 'Email summarization tasks enqueued.' });
+    // const summaries = await getSummaries(emails)
+    
+    // let summaryList: any[] = []
+    // summaries.map(async (summary) => {
+    //   let summaryObj = JSON.parse(summary.summary)
+    //   summaryObj['sender'] = summary.sender
+    //   summaryObj['subject'] = summary.subject
+    //   summaryObj['date'] = summary.date
+    //   summaryObj['userID'] = String(user._id)
+    //   summaryList.push(summaryObj)
+    //   await Summary.create(summaryObj)
+    // })
+    // return Response.json({emails: emails, summaries: summaries, summaryDetails: summaryList})
 } catch (error) {
-    console.error(error);
+    // console.error(error);
     return Response.json({error: error})
 }
 }

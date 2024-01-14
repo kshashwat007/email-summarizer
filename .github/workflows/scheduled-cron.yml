@@ -1,0 +1,16 @@
+name: Scheduled API Call
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Run every day at midnight
+
+jobs:
+  call-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Make API Call
+        run: |
+          # Use a tool like curl or HTTPie to make an API call
+          # Example using curl:
+          curl -X GET https://your-api-endpoint.com/your-endpoint

@@ -40,7 +40,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         </head>
       )}
       <body>
-        <div className="flex h-screen">
+        <div className="">
           {/* <Sidebar /> */}
           <ClientLayout>{children}</ClientLayout>
         </div>
