@@ -19,7 +19,7 @@ const redisConfig = {
 const redisConnection = new Redis(redisConfig)
 
 const openai = new OpenAI({
-  apiKey: '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'
+  apiKey: process.env.OPENAI_API_KEY
 })
 
 const emailSummarizationQueue = new Worker(
