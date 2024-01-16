@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: String
     },
+    openaiKey: {
+      type: String
+    },
     image: {
       type: String,
     },

@@ -1,11 +1,7 @@
-// const { CronJob } = require('cron');
 // @ts-ignore
 const { Queue, Worker, Job } = require('bullmq')
 const { OpenAI } = require('openai')
-// const connectMongo = require('./libs/mongoose.ts')
 import connectMongo from './libs/mongoose'
-// const Summary = require('./models/Summary.ts')
-// const User = require('./models/User.ts')
 import User from './models/User'
 import Summary from './models/Summary'
 const Redis = require('ioredis')
@@ -18,22 +14,21 @@ const redisConfig = {
 
 const redisConnection = new Redis(redisConfig)
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
-
 const emailSummarizationQueue = new Worker(
   'emailSummarizer',
   async (job) => {
-    const data = job.data
     console.log('Data')
     await connectMongo()
+
     console.log('DB Connected')
     const { userId, emailContent, sender, subject, date } = job.data
     console.log('ID', userId)
-    // const user = await User.findById(userId)
+
+    const userOpenAIToken = await User.findOne({ _id: userId })
+      .select('openaiKey')
+      .exec()
     // console.log('User', user)
-    let summary = await summarizeEmail(emailContent)
+    let summary = await summarizeEmail(emailContent, userOpenAIToken)
     console.log('Summarizing')
     let summaryObj = JSON.parse(summary)
     summaryObj['sender'] = sender
@@ -55,9 +50,12 @@ emailSummarizationQueue.on('failed', (job, failedReason) => {
 
 // console.log('queue', emailSummarizationQueue)
 
-async function summarizeEmail(emailBody) {
+async function summarizeEmail(emailBody, openaiKey) {
   // console.log('Body', emailBody)
   try {
+    const openai = new OpenAI({
+      apiKey: openaiKey
+    })
     const completion = await openai.chat.completions.create({
       messages: [
         {
@@ -77,13 +75,3 @@ async function summarizeEmail(emailBody) {
     throw error
   }
 }
-
-// new CronJob(
-//   '* * * * * *',
-//   async function () {
-//     console.log('GETTING!');
-//   },
-//   null,
-//   true,
-//   'America/Los_Angeles'
-// );
