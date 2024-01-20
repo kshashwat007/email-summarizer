@@ -88,7 +88,7 @@ const EmailSummary = ({ email }) => {
       <div className="additional-actions mb-4 mt-4">
         <button className="btn btn-outline mr-2" onClick={deleteSummary}>Delete</button>
           {/* ... */}
-        </div>
+      </div>
     </div>
   );
 };
