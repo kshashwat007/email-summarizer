@@ -17,6 +17,29 @@ const EmailSummary = ({ email }) => {
     router.push(`/summary-data/${email.id}`);
   };
 
+  const deleteSummary = () => {
+    fetch(`http://localhost:3000/api/summary/deleteSummary?id=${email.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Summary Deleted")
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+    router.refresh()
+    location.reload()
+  }
+
   return (
     <div className="card bg-[#FFFFFF] p-6 mt-3 w-full max-w-md lg:max-w-lg xl:max-w-xl shadow-md rounded-xl overflow-hidden border border-[#d5e3f9]">
       <div className="flex justify-between items-start mb-4">
@@ -62,6 +85,10 @@ const EmailSummary = ({ email }) => {
           </svg>
         </button>
       </div>
+      <div className="additional-actions mb-4 mt-4">
+        <button className="btn btn-outline mr-2" onClick={deleteSummary}>Delete</button>
+          {/* ... */}
+        </div>
     </div>
   );
 };
