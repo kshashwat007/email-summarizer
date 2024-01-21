@@ -8,6 +8,7 @@ import ClientLayout from "@/components/LayoutClient";
 import PlausibleProvider from "next-plausible";
 import { Inter } from "next/font/google";
 import { Viewport } from "next";
+import Head from 'next/head'
 
 // This is a server-side component to ensure the user is logged in.
 // If not, it will redirect to the login page.
@@ -39,9 +40,11 @@ export default async function LayoutPrivate({
       {config.domainName && (
         <head>
           <PlausibleProvider domain={config.domainName} />
+          
         </head>
       )}
       <body>
+        
         <div className="flex h-screen">
           <Sidebar />
           <ClientLayout>{children}</ClientLayout>

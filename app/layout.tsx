@@ -11,6 +11,7 @@ import { SessionProvider } from 'next-auth/react';
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/next-auth";
+import Script from "next/script";
 
 const font = Inter({ subsets: ["latin"] });
 
