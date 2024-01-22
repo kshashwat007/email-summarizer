@@ -21,7 +21,8 @@ const userSchema = new mongoose.Schema(
       type: String
     },
     openaiKey: {
-      type: String
+      type: String,
+      default: ''
     },
     image: {
       type: String,

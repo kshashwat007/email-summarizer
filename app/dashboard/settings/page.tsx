@@ -1,10 +1,41 @@
 "use client"
 import ButtonAccount from '@/components/ButtonAccount';
+import { authOptions } from '@/libs/next-auth';
+import { getServerSession } from 'next-auth';
+import email from 'next-auth/providers/email';
 import React, { useState } from 'react'
+import { useSession, signOut } from "next-auth/react";
 
 const page = () => {
 
   const [openTab, setOpenTab] = useState(1);
+  const [openaiKey, setOpenaiKey] = useState("")
+  const { data: session, status } = useSession();
+
+  const updateUser = () => {
+    // const session = await getServerSession(authOptions);
+    let data = {
+      openaiKey: openaiKey
+    }
+    console.log("ID",session.user.id)
+    fetch(`http://localhost:3000/api/user/updateUser?id=${session.user.id}`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("User Updated Deleted")
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }
 
   return (
     <div className='container m-8'>
@@ -37,7 +68,9 @@ const page = () => {
           <div className="label">
             <span className="label-text">OpenAI Key(Optional)</span>
           </div>
-          <input type="text" placeholder="a**************" className="input input-bordered w-full max-w-xs" />
+          <input type="text" placeholder="a**************" className="input input-bordered w-full max-w-xs" id="openaiKey" onChange={(e) => {
+            setOpenaiKey(e.target.value)
+          }}/>
         </label>
       </div>
 
@@ -83,7 +116,7 @@ const page = () => {
       
 
       <div className="additional-actions mb-4 mt-4 p-4">
-        <button className="btn btn-outline mr-2 w-[148px]">Save</button>
+        <button className="btn btn-outline mr-2 w-[148px]" onClick={updateUser}>Save</button>
           {/* ... */}
       </div>
     </div>
