@@ -9,6 +9,7 @@ import PlausibleProvider from "next-plausible";
 import { Inter } from "next/font/google";
 import { Viewport } from "next";
 import Head from 'next/head'
+import 'react-toastify/dist/ReactToastify.css';
 
 // This is a server-side component to ensure the user is logged in.
 // If not, it will redirect to the login page.

@@ -41,6 +41,7 @@
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.21.1",
     "react-syntax-highlighter": "^15.5.0",
+    "react-toastify": "^10.0.4",
     "react-tooltip": "^5.21.1",
     "redis": "^4.6.12",
     "redis-cli": "^2.1.2",

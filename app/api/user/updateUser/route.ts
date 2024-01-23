@@ -14,7 +14,7 @@ export async function PATCH(request: NextRequest) {
     const id = url.searchParams.get("id")
     let data = await request.json()
     console.log("ID",id)
-    const user = await User.findByIdAndUpdate(id,data)
+    const user = await User.findByIdAndUpdate(id,data,{ new: true })
     await user.save()
     if (!user) {
       return Response.json({error:"Update Error"})

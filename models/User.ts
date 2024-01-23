@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
+    summaryTime: {
+      type: String,
+      default: '9am-12pm'
+    },
     image: {
       type: String,
     },
@@ -50,6 +54,7 @@ const userSchema = new mongoose.Schema(
   {
     timestamps: true,
     toJSON: { virtuals: true },
+    strict: false,
   }
 );
 
