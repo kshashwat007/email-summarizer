@@ -12,6 +12,7 @@ const page = () => {
   const [openTab, setOpenTab] = useState(1);
   const [openaiKey, setOpenaiKey] = useState("")
   const [summaryTime, setSummaryTime] = useState("")
+  const [summaryLength, setSummaryLength] = useState("")
   const { data: session, status } = useSession();
 
   const updateUser = () => {
@@ -25,6 +26,9 @@ const page = () => {
       data["summaryTime"]  = summaryTime
     }
     
+    if (summaryLength != "") {
+      data["summaryLength"]  = summaryLength
+    }
     console.log("Data",data)
     console.log("ID",session.user.id)
     fetch(`http://localhost:3000/api/user/updateUser?id=${session.user.id}`, {
@@ -115,8 +119,8 @@ const page = () => {
         </div>
         <select className="select select-bordered w-full max-w-xs m-4" onChange={(e) => {
           setSummaryTime(e.target.value)
-        }}>
-          <option disabled selected>Select time</option>
+        }} disabled>
+          <option disabled selected>Select Time (Coming Soon)</option>
           <option>9am-12pm</option>
           <option>1pm-4pm</option>
           <option>4pm-8pm</option>
@@ -124,8 +128,10 @@ const page = () => {
         <div className="label pl-4 mt-4">
           <span className="label-text">Summary Length</span>
         </div>
-        <select className="select select-bordered w-full max-w-xs m-4" disabled>
-          <option disabled selected>Select Length Preference</option>
+        <select className="select select-bordered w-full max-w-xs m-4" onChange={(e) => {
+          setSummaryLength(e.target.value)
+        }}>
+          <option disabled selected>Length Preference</option>
           <option>Very Short</option>
           <option>Short</option>
           <option>Medium</option>
@@ -135,7 +141,7 @@ const page = () => {
           <div className="label">
             <span className="label-text">Label Preference</span>
           </div>
-          <input type="text" placeholder="Select Labels" className="input input-bordered w-full max-w-xs" disabled/>
+          <input type="text" placeholder="Select Labels (Coming Soon)" className="input input-bordered w-full max-w-xs" disabled/>
         </label>
         
       </div>
@@ -145,7 +151,7 @@ const page = () => {
           <span className="label-text">Notification Preference</span>
         </div>
         <select className="select select-bordered w-full max-w-xs m-4" disabled>
-          <option disabled selected>Select Notification Preference</option>
+          <option disabled selected>Notification Preference (Coming Soon)</option>
           <option>On</option>
           <option>Off</option>
         </select>

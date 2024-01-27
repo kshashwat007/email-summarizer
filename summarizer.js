@@ -21,14 +21,19 @@ const emailSummarizationQueue = new Worker(
     await connectMongo()
 
     console.log('DB Connected')
-    const { userId, emailContent, sender, subject, date } = job.data
+    const { userId, emailContent, sender, subject, date, summaryLength } =
+      job.data
     console.log('ID', userId)
 
     const userOpenAIToken = await User.findOne({ _id: userId })
       .select('openaiKey')
       .exec()
     // console.log('User', user)
-    let summary = await summarizeEmail(emailContent, userOpenAIToken)
+    let summary = await summarizeEmail(
+      emailContent,
+      userOpenAIToken,
+      summaryLength
+    )
     console.log('Summarizing')
     let summaryObj = JSON.parse(summary)
     summaryObj['sender'] = sender
@@ -50,18 +55,30 @@ emailSummarizationQueue.on('failed', (job, failedReason) => {
 
 // console.log('queue', emailSummarizationQueue)
 
-async function summarizeEmail(emailBody, openaiKey) {
+async function summarizeEmail(emailBody, openaiKey, summaryLength) {
   // console.log('Body', emailBody)
   try {
     const openai = new OpenAI({
       apiKey: openaiKey
     })
+
+    let prompt = `You will be provided with the body of an email. Your task is to analyze the content 
+and produce a summary. Specifically, you need to:
+1. **Summarize the Email:** Extract the main points and themes from the email content.
+2. **Extract Links:** Identify any URLs or web links included in the email body.
+3. **Identify Action Items:** Highlight any tasks, requests, or action items mentioned.
+3. Summary Length: The Summary Length should be ${summaryLength}
+The output should be formatted as a JSON object, with the following keys and corresponding information:
+- \`summary\`: A concise overview of the email's content.
+- \`links\`: A list of any URLs found in the email.
+- \`action_items\`: A list of tasks or actions that the recipient is expected to undertake.
+The JSON should be readable, without unnecessary escape characters or slashes, and should be structured for easy understanding.`
+
     const completion = await openai.chat.completions.create({
       messages: [
         {
           role: 'system',
-          content:
-            'You are a helpful assistant which summarizes emails based on the email body provided. For each body, get the links in it, summarize the email, if any action items provide that. I should know what the email is all about. Output should be in json and it should be beautified with no slashes and proper readable format. The keys will be different sections such as summary, links, action items etc. The keys name should be summary,links,action_items'
+          content: prompt
         },
         { role: 'user', content: `This is the email body. ${emailBody}` }
       ],

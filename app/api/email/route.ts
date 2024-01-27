@@ -174,6 +174,7 @@ export async function GET(request: NextRequest) {
           sender: email.sender,
           subject: email.subject,
           date: email.date,
+          summaryLength: user.summaryLength
           // openai: openai
         });
       });
