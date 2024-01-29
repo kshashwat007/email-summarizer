@@ -89,7 +89,7 @@ const SummaryData = ({ params }: { params: { id: string } }) => {
 
         {/* Additional Actions */}
         <div className="additional-actions mb-4 mt-4">
-          <button className="btn btn-outline mr-2">Delete</button>
+          {/* <button className="btn btn-outline mr-2">Delete</button> */}
           {/* ... */}
         </div>
       </div>
