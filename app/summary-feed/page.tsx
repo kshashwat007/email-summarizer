@@ -20,7 +20,7 @@ const EmailSummary = ({ email }) => {
 
   const deleteSummary = () => {
     try {
-      fetch(`http://localhost:3000/api/summary/deleteSummary?id=${email.id}`, {
+      fetch(`${process.env.DOMAIN}/api/summary/deleteSummary?id=${email.id}`, {
       method: 'PATCH',
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
@@ -106,7 +106,7 @@ const SummaryFeed = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/summaries')
+    fetch(`${process.env.DOMAIN}/api/summaries`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -123,7 +123,7 @@ const SummaryFeed = () => {
         setError(error);
         setLoading(false);
       });
-    fetch('http://localhost:3000/api/user')
+    fetch(`${process.env.DOMAIN}/api/user`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
