@@ -4,7 +4,7 @@ const { OpenAI } = require('openai')
 import connectMongo from './libs/mongoose'
 import User from './models/User'
 import Summary from './models/Summary'
-const Redis = require('ioredis')
+import { Redis } from '@upstash/redis'
 
 const redisConnection = new Redis({
   url: 'https://eu2-related-treefrog-30277.upstash.io',

@@ -9,8 +9,7 @@ import { getServerSession } from "next-auth";
 import Bee from 'bee-queue';
 const { Queue, Worker } = require('bullmq')
 import { createClient } from 'redis';
-
-const Redis = require('ioredis');
+import { Redis } from '@upstash/redis'
 
 const redisConnection = new Redis({
   url: 'https://eu2-related-treefrog-30277.upstash.io',
