@@ -59,7 +59,7 @@ const SummaryData = ({ params }: { params: { id: string } }) => {
           <div>
             <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase">Action Items</h3>
             <ul className="list-disc pr-4 space-y-2"> {/* Adjusted right padding */}
-              {summary.action_items.map((item, index) => (
+              {summary.action_items.map((item:any, index:any) => (
                 <div key={index} className='flex items-center'>
                   <input type="checkbox" id={`action-item-${index}`} className="checkbox checkbox-sm mr-2" />
                   <label className="text-xs text-gray-600 break-all" htmlFor={`action-item-${index}`}>{item}</label>
@@ -77,7 +77,7 @@ const SummaryData = ({ params }: { params: { id: string } }) => {
           <div className="mt-4">
             <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase">Extracted Links</h3>
             <ul className="list-disc pl-4 space-y-2">
-              {summary.links.map((item, index) => (
+              {summary.links.map((item:any, index:any) => (
                 <li key={index} className="text-xs text-gray-600">
                   <a href={item} className="break-all" target="_blank" rel="noopener noreferrer">{item}</a>
                 </li>

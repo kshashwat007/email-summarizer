@@ -59,9 +59,9 @@ function getPlainTextBody(message: { payload: {
   // Emails may be multipart, check the payload parts
   const parts = message.payload.parts || [];
   let plainTextBody = "";
-  const sender = message.payload.headers.find((obj) => obj.name == "From").value
-  const subject = message.payload.headers.find((obj) => obj.name == "Subject").value
-  const date = message.payload.headers.find((obj) => obj.name == "Date").value
+  const sender = message.payload.headers.find((obj: { name: string; }) => obj.name == "From").value
+  const subject = message.payload.headers.find((obj: { name: string; }) => obj.name == "Subject").value
+  const date = message.payload.headers.find((obj: { name: string; }) => obj.name == "Date").value
   for (const part of parts) {
       if (part.mimeType === 'text/plain') {
           plainTextBody = part.body.data;
@@ -85,7 +85,7 @@ function getPlainTextBody(message: { payload: {
 
 function decodeBase64Url(encodedStr: string) {
   // Replace URL-safe characters
-  const base64String = encodedStr.replace(/\-/g, '+').replace(/_/g, '/');
+  const base64String = encodedStr.replace(/-/g, '+').replace(/_/g, '/');
   // Base64 decode
   const decodedBytes = Buffer.from(base64String, 'base64').toString('utf-8');
   return decodedBytes;

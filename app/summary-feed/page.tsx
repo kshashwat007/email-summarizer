@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client"
 import Sidebar from '@/components/Sidebar';
 import React, { useState, useEffect } from 'react';

@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 }
 
 
-async function summarizeEmail(emailBody, openaiKey, summaryLength) {
+async function summarizeEmail(emailBody: any, openaiKey: any, summaryLength: any) {
   // console.log('Body', emailBody)
   try {
     const openai = new OpenAI({

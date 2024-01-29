@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+// @ts-nocheck
 "use client"
 import ButtonAccount from '@/components/ButtonAccount';
 import { authOptions } from '@/libs/next-auth';

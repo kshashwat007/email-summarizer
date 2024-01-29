@@ -1,7 +1,6 @@
 "use client"
 import Link from "next/link";
 import ButtonSignin from "@/components/ButtonSignin";
-import ActionItemsSidebar from "./action-items/page";
 import SummaryFeed from "./summary-feed/page";
 import data from '../testdata.json'
 import Sidebar from "@/components/Sidebar";
