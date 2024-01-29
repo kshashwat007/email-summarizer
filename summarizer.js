@@ -6,12 +6,6 @@ import User from './models/User'
 import Summary from './models/Summary'
 const Redis = require('ioredis')
 
-const redisConfig = {
-  port: 6379,
-  host: '127.0.0.1',
-  maxRetriesPerRequest: null
-}
-
 const redisConnection = new Redis({
   url: 'https://eu2-related-treefrog-30277.upstash.io',
   token: process.env.UPSTASH_REDIS_TOKEN,

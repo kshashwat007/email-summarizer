@@ -12,11 +12,6 @@ import { createClient } from 'redis';
 
 const Redis = require('ioredis');
 
-const redisConfig = {
-  port: 6379,
-  host: '127.0.0.1',
-};
-
 const redisConnection = new Redis({
   url: 'https://eu2-related-treefrog-30277.upstash.io',
   token: process.env.UPSTASH_REDIS_TOKEN
