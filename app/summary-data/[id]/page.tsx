@@ -7,7 +7,8 @@ const SummaryData = ({ params }: { params: { id: string } }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/summary?id=${params.id}`)
+    try {
+      fetch(`http://localhost:3000/api/summary?id=${params.id}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -24,6 +25,10 @@ const SummaryData = ({ params }: { params: { id: string } }) => {
         setError(error);
         setLoading(false);
       });
+    } catch (error) {
+      console.log(error)
+    }
+    
   }, []);
 
   if (loading) {

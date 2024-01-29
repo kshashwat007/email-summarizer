@@ -19,7 +19,8 @@ const EmailSummary = ({ email }) => {
   };
 
   const deleteSummary = () => {
-    fetch(`http://localhost:3000/api/summary/deleteSummary?id=${email.id}`, {
+    try {
+      fetch(`http://localhost:3000/api/summary/deleteSummary?id=${email.id}`, {
       method: 'PATCH',
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
@@ -39,6 +40,10 @@ const EmailSummary = ({ email }) => {
       });
     router.refresh()
     location.reload()
+    } catch (error) {
+      console.log(error)
+    }
+    
   }
 
   return (

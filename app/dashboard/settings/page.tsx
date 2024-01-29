@@ -32,8 +32,9 @@ const page = () => {
       data["summaryLength"]  = summaryLength
     }
     console.log("Data",data)
-    console.log("ID",session.user.id)
-    fetch(`http://localhost:3000/api/user/updateUser?id=${session.user.id}`, {
+    console.log("ID", session.user.id)
+    try {
+      fetch(`http://localhost:3000/api/user/updateUser?id=${session.user.id}`, {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(data)
@@ -62,6 +63,10 @@ const page = () => {
       .catch(error => {
         console.error('Error fetching data:', error);
       });
+    } catch (error) {
+      console.log(error)
+    }
+    
   }
 
   return (
