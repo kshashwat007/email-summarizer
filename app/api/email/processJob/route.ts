@@ -1,63 +1,59 @@
-// @ts-ignore
-const { Queue, Worker, Job } = require('bullmq')
-const { OpenAI } = require('openai')
-import connectMongo from './libs/mongoose'
-import User from './models/User'
-import Summary from './models/Summary'
-const Redis = require('ioredis')
+import { NextResponse, NextRequest } from "next/server";
+const { google } = require('googleapis');
+import OpenAI from "openai";
+import Summary from "@/models/Summary";
+import connectMongo from "@/libs/mongoose";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/next-auth";
+import User from "@/models/User";
+import {Client} from '@upstash/qstash'
 
-const redisConfig = {
-  port: 6379,
-  host: '127.0.0.1',
-  maxRetriesPerRequest: null
-}
+const qstash = new Client({
+  token: process.env.QSTASH_TOKEN,
+});
 
-const redisConnection = new Redis({
-  url: 'https://eu2-related-treefrog-30277.upstash.io',
-  token: process.env.UPSTASH_REDIS_TOKEN,
-  maxRetriesPerRequest: null
-})
-
-const emailSummarizationQueue = new Worker(
-  'emailSummarizer',
-  async (job) => {
-    console.log('Data')
-    await connectMongo()
-
-    console.log('DB Connected')
-    const { userId, emailContent, sender, subject, date, summaryLength } =
-      job.data
-    console.log('ID', userId)
-
+const schedules = qstash.schedules
+schedules.create({
+  destination: "https://qstash.upstash.io/v2/publish/",
+  cron: "*/5 * * * *",
+});
+schedules.create({
+  destination: "https://my-api...",
+  cron: "*/5 * * * *",
+});
+export async function POST(request: NextRequest) {
+  try {
+    await connectMongo();
+    
+    const { userId, emailContent, sender, subject, date, summaryLength } = await request.json()
+    console.log("ID", userId)
+    console.log("date",date)
+    console.log("length",summaryLength)
     const userOpenAIToken = await User.findOne({ _id: userId })
       .select('openaiKey')
       .exec()
-    // console.log('User', user)
+    
+    
+    console.log('User api key', userOpenAIToken.openaiKey)
     let summary = await summarizeEmail(
       emailContent,
       userOpenAIToken.openaiKey,
       summaryLength
     )
-    console.log('Summarizing')
     let summaryObj = JSON.parse(summary)
     summaryObj['sender'] = sender
     summaryObj['subject'] = subject
     summaryObj['date'] = date
     summaryObj['userID'] = userId
-    console.log('SummaryData')
     await Summary.create(summaryObj)
     console.log('Data save')
-  },
-  {
-    connection: redisConnection
-  }
-)
+    return Response.json({message: 'Email processed successfully'})
+} catch (error) {
+    console.error(error);
+    return Response.json({error: error})
+}
+}
 
-emailSummarizationQueue.on('failed', (job, failedReason) => {
-  console.error(`Job #${job.id} failed with reason: ${failedReason}`)
-})
-
-// console.log('queue', emailSummarizationQueue)
 
 async function summarizeEmail(emailBody, openaiKey, summaryLength) {
   // console.log('Body', emailBody)

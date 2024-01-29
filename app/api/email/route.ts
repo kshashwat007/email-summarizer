@@ -17,7 +17,10 @@ const redisConfig = {
   host: '127.0.0.1',
 };
 
-const redisConnection = new Redis(redisConfig);
+const redisConnection = new Redis({
+  url: 'https://eu2-related-treefrog-30277.upstash.io',
+  token: process.env.UPSTASH_REDIS_TOKEN
+})
 // const redis = new Redis({
 //   host: "127.0.0.1",
 //   port: 6379,
@@ -177,7 +180,7 @@ export async function GET(request: NextRequest) {
           summaryLength: user.summaryLength
           // openai: openai
         });
-      });
+              });
       await Promise.all(enqueuedJobs);
     });
     
