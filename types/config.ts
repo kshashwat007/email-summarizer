@@ -23,6 +23,7 @@ export type Theme =
   | "";
 
 export interface ConfigProps {
+  env: any;
   appName: string;
   appDescription: string;
   domainName: string;

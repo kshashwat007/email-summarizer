@@ -2,6 +2,9 @@ import themes from "daisyui/src/theming/themes.js";
 import { ConfigProps } from "./types/config";
 
 const config = {
+  env: {
+    domain: process.env.NEXT_PUBLIC_DOMAIN,
+  },
   // REQUIRED
   appName: "Summailize",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)

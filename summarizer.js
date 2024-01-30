@@ -8,8 +8,8 @@ import { Redis } from '@upstash/redis'
 
 const redisConnection = new Redis({
   url: 'https://eu2-related-treefrog-30277.upstash.io',
-  token: process.env.UPSTASH_REDIS_TOKEN,
-  maxRetriesPerRequest: null
+  token:
+    'AXZFASQgMDc2ZDk0ODAtYzU5Ni00MDY4LTkxMzYtOWI1ODlmYzZkNmJlMjEzZTlmYzlhZTU0NGE1NWIxMTJkYTI5ZGRiZmMwM2E='
 })
 
 const emailSummarizationQueue = new Worker(

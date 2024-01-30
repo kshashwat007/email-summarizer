@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react'
+import config from '@/config';
 
 const SummaryData = ({ params }: { params: { id: string } }) => {
   const [summary, setSummary] = useState(null);
@@ -8,7 +9,7 @@ const SummaryData = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     try {
-      fetch(`${process.env.DOMAIN}/api/summary?id=${params.id}`)
+      fetch(`${config.env.domain}/api/summary?id=${params.id}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');

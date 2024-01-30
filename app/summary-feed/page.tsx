@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import Summary from '@/models/Summary';
 import connectMongo from '@/libs/mongoose';
 import ButtonAccount from '@/components/ButtonAccount';
+import config from '@/config';
 
 const EmailSummary = ({ email }) => {
   const router = useRouter();
@@ -20,7 +21,7 @@ const EmailSummary = ({ email }) => {
 
   const deleteSummary = () => {
     try {
-      fetch(`${process.env.DOMAIN}/api/summary/deleteSummary?id=${email.id}`, {
+      fetch(`${config.env.domain}/api/summary/deleteSummary?id=${email.id}`, {
       method: 'PATCH',
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
@@ -106,7 +107,7 @@ const SummaryFeed = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${process.env.DOMAIN}/api/summaries`)
+    fetch(`${config.env.domain}/api/summaries`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -123,7 +124,7 @@ const SummaryFeed = () => {
         setError(error);
         setLoading(false);
       });
-    fetch(`${process.env.DOMAIN}/api/user`)
+    fetch(`${config.env.domain}/api/user`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');

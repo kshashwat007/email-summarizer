@@ -8,6 +8,7 @@ import email from 'next-auth/providers/email';
 import React, { useState } from 'react'
 import { useSession, signOut } from "next-auth/react";
 import { Bounce, ToastContainer, toast } from 'react-toastify';
+import config from '@/config';
 
 const page = () => {
 
@@ -34,7 +35,7 @@ const page = () => {
     console.log("Data",data)
     console.log("ID", session.user.id)
     try {
-      fetch(`${process.env.DOMAIN}/api/user/updateUser?id=${session.user.id}`, {
+      fetch(`${config.env.domain}/api/user/updateUser?id=${session.user.id}`, {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(data)
