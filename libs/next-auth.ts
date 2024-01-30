@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptionsExtended = {
     async redirect({ url, baseUrl }) {
       console.log("URL",url,baseUrl)
       if (url.startsWith(baseUrl)) {
-        return `${process.env.NEXTAUTH_URL}/dashboard`;
+        return `${baseUrl}/dashboard`;
       }
       // Fallback to the homepage or any other URL you consider safe
       return baseUrl;
