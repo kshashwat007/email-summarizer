@@ -65,7 +65,12 @@ export const authOptions: NextAuthOptionsExtended = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      return `${process.env.NEXTAUTH_URL}/dashboard`
+      console.log("URL",url,baseUrl)
+      if (url.startsWith(baseUrl)) {
+        return `${process.env.NEXTAUTH_URL}/dashboard`;
+      }
+      // Fallback to the homepage or any other URL you consider safe
+      return baseUrl;
     }
   },
   session: {
