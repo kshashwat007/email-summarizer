@@ -3,7 +3,7 @@ const { google } = require('googleapis');
 import OpenAI from "openai";
 import Summary from "@/models/Summary";
 import connectMongo from "@/libs/mongoose";
-
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {

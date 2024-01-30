@@ -10,6 +10,7 @@ import Bee from 'bee-queue';
 const { Queue, Worker } = require('bullmq')
 import { createClient } from 'redis';
 import { Redis } from '@upstash/redis'
+export const dynamic = 'force-dynamic'
 
 const redisConnection = new Redis({
   url: 'https://eu2-related-treefrog-30277.upstash.io',
