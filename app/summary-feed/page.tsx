@@ -21,7 +21,7 @@ const EmailSummary = ({ email }) => {
 
   const deleteSummary = () => {
     try {
-      fetch(`${config.env.domain}/api/summary/deleteSummary?id=${email.id}`, {
+      fetch(`/api/summary/deleteSummary?id=${email.id}`, {
       method: 'PATCH',
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
@@ -107,7 +107,7 @@ const SummaryFeed = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${config.env.domain}/api/summaries`)
+    fetch(`/api/summaries`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -124,7 +124,7 @@ const SummaryFeed = () => {
         setError(error);
         setLoading(false);
       });
-    fetch(`${config.env.domain}/api/user`)
+    fetch(`/api/user`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');

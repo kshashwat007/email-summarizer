@@ -9,7 +9,7 @@ const SummaryData = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     try {
-      fetch(`${config.env.domain}/api/summary?id=${params.id}`)
+      fetch(`/api/summary?id=${params.id}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
