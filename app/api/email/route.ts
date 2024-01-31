@@ -14,16 +14,9 @@ export const dynamic = 'force-dynamic'
 
 const redisConnection = new Redis({
   url: 'https://eu2-related-treefrog-30277.upstash.io',
-  token: process.env.UPSTASH_REDIS_TOKEN
+  token:
+    'AXZFASQgMDc2ZDk0ODAtYzU5Ni00MDY4LTkxMzYtOWI1ODlmYzZkNmJlMjEzZTlmYzlhZTU0NGE1NWIxMTJkYTI5ZGRiZmMwM2E='
 })
-// const redis = new Redis({
-//   host: "127.0.0.1",
-//   port: 6379,
-//   username: "krishusername",
-//   password: 'krishpassword'
-// });
-
-
 
 
 const emailSummarizationQueue = new Queue('emailSummarizer', {
