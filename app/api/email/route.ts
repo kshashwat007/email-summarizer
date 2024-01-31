@@ -169,7 +169,7 @@ export async function GET(request: NextRequest) {
       const emails = await fetchUnreadEmails(auth);
       // console.log("EMAILS", emails)
       let enqueuedJobs = emails.map(async (email) => {
-        return await emailSummarizationQueue.add("emailSummarizer",{
+        return await emailSummarizationQueue.add("emailSummarizerProd",{
           userId: user._id,
           emailContent: email.decodedBody,
           sender: email.sender,

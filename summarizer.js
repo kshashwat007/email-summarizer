@@ -18,7 +18,7 @@ const redisConnection = new Redis(
 // })
 
 const emailSummarizationQueue = new Worker(
-  'emailSummarizer',
+  'emailSummarizerProd',
   async (job) => {
     console.log('Data')
     await connectMongo()
