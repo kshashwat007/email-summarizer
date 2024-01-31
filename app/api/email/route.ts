@@ -9,14 +9,24 @@ import { getServerSession } from "next-auth";
 import Bee from 'bee-queue';
 const { Queue, Worker } = require('bullmq')
 import { createClient } from 'redis';
-import { Redis } from '@upstash/redis'
+// import { Redis } from '@upstash/redis'
+import {Redis} from "ioredis"
 export const dynamic = 'force-dynamic'
 
-const redisConnection = new Redis({
-  url: 'https://eu2-related-treefrog-30277.upstash.io',
-  token:
-    'AXZFASQgMDc2ZDk0ODAtYzU5Ni00MDY4LTkxMzYtOWI1ODlmYzZkNmJlMjEzZTlmYzlhZTU0NGE1NWIxMTJkYTI5ZGRiZmMwM2E='
-})
+const redisConnection = new Redis("rediss://default:213e9fc9ae544a55b112da29ddbfc03a@eu2-related-treefrog-30277.upstash.io:30277",{maxRetriesPerRequest: null});
+// const redisConnection = new Redis({
+//   url: 'https://eu2-related-treefrog-30277.upstash.io',
+//   token:
+//     'AXZFASQgMDc2ZDk0ODAtYzU5Ni00MDY4LTkxMzYtOWI1ODlmYzZkNmJlMjEzZTlmYzlhZTU0NGE1NWIxMTJkYTI5ZGRiZmMwM2E='
+// })
+// const redis = new Redis({
+//   host: "127.0.0.1",
+//   port: 6379,
+//   username: "krishusername",
+//   password: 'krishpassword'
+// });
+
+
 
 
 const emailSummarizationQueue = new Queue('emailSummarizer', {

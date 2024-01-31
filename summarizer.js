@@ -4,13 +4,18 @@ const { OpenAI } = require('openai')
 import connectMongo from './libs/mongoose'
 import User from './models/User'
 import Summary from './models/Summary'
-import { Redis } from '@upstash/redis'
+// import { Redis } from '@upstash/redis'
+import { Redis } from 'ioredis'
 
-const redisConnection = new Redis({
-  url: 'https://eu2-related-treefrog-30277.upstash.io',
-  token:
-    'AXZFASQgMDc2ZDk0ODAtYzU5Ni00MDY4LTkxMzYtOWI1ODlmYzZkNmJlMjEzZTlmYzlhZTU0NGE1NWIxMTJkYTI5ZGRiZmMwM2E='
-})
+const redisConnection = new Redis(
+  'rediss://default:213e9fc9ae544a55b112da29ddbfc03a@eu2-related-treefrog-30277.upstash.io:30277',
+  { maxRetriesPerRequest: null }
+)
+// const redisConnection = new Redis({
+//   url: 'https://eu2-related-treefrog-30277.upstash.io',
+//   token:
+//     'AXZFASQgMDc2ZDk0ODAtYzU5Ni00MDY4LTkxMzYtOWI1ODlmYzZkNmJlMjEzZTlmYzlhZTU0NGE1NWIxMTJkYTI5ZGRiZmMwM2E='
+// })
 
 const emailSummarizationQueue = new Worker(
   'emailSummarizer',
