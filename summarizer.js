@@ -20,23 +20,23 @@ const redisConnection = new Redis(
 const emailSummarizationQueue = new Worker(
   'emailSummarizerProd',
   async (job) => {
-    console.log('Data')
+    console.log('Data', job.data)
     await connectMongo()
 
     console.log('DB Connected')
-    const { userId, emailContent, sender, subject, date, summaryLength } =
-      job.data
+    const {
+      userId,
+      openaiKey,
+      emailContent,
+      sender,
+      subject,
+      date,
+      summaryLength
+    } = job.data
     console.log('ID', userId)
 
-    const userOpenAIToken = await User.findOne({ _id: userId })
-      .select('openaiKey')
-      .exec()
     // console.log('User', user)
-    let summary = await summarizeEmail(
-      emailContent,
-      userOpenAIToken.openaiKey,
-      summaryLength
-    )
+    let summary = await summarizeEmail(emailContent, openaiKey, summaryLength)
     console.log('Summarizing')
     let summaryObj = JSON.parse(summary)
     summaryObj['sender'] = sender

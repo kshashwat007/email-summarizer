@@ -18,9 +18,14 @@ const client = new Client({ token: "eyJVc2VySUQiOiIyNDQwZDBkNC0zMTczLTQ1ZmMtYThh
 
 const redisConnection = new Redis("rediss://default:213e9fc9ae544a55b112da29ddbfc03a@eu2-related-treefrog-30277.upstash.io:30277",{maxRetriesPerRequest: null});
 
+// const redisConnection = new Redis({
+//   url: 'https://eu2-related-treefrog-30277.upstash.io',
+//   token:
+//     'AXZFASQgMDc2ZDk0ODAtYzU5Ni00MDY4LTkxMzYtOWI1ODlmYzZkNmJlMjEzZTlmYzlhZTU0NGE1NWIxMTJkYTI5ZGRiZmMwM2E='
+// })
 
 
-const emailSummarizationQueue = new Queue('emailSummarizer', {
+const emailSummarizationQueue = new Queue('emailSummarizerProd', {
   connection: redisConnection,
   limiter: {
     max: 20,
@@ -161,8 +166,9 @@ export async function GET(request: NextRequest) {
       const emails = await fetchUnreadEmails(auth);
       
       let openaiKey = process.env.OPENAI_API_KEY
+      console.log(openaiKey)
       let enqueuedJobs = emails.map(async (email) => {
-        let summaryBody = {
+        return await emailSummarizationQueue.add("emailJob",{
           "userId": user._id,
           "openaiKey": openaiKey,
           "emailContent": email.decodedBody,
@@ -170,22 +176,12 @@ export async function GET(request: NextRequest) {
           "subject": email.subject,
           "date": email.date,
           "summaryLength": user.summaryLength
-        }
-        // console.log("Body", summaryBody)
-        // client.publishJSON({
-        //   url: "https://summarize-worker.kshashwat007.workers.dev",
-        //   body: summaryBody,
-        //   headers: {
-        //     'Content-type': 'application/json; charset=UTF-8', 'Authorization': `Bearer eyJVc2VySUQiOiIyNDQwZDBkNC0zMTczLTQ1ZmMtYThhMy0wMmE1ZGIxOWEzODQiLCJQYXNzd29yZCI6ImRhNzA4NTYxN2VhMjQ4ZmNiYTlkNTUzY2NkOWY2OGI5In0=`
-        //   },
-        //   delay: 10
-        // })
-        
-        return await emailSummarizationQueue.add("emailSummarizerProd",summaryBody);
+        });
       });
       await Promise.all(enqueuedJobs);
     });
-    
+    const counts = await emailSummarizationQueue.getJobCounts('wait', 'completed', 'failed');
+    console.log("Done", counts)
     return Response.json({ message: 'Email summarization tasks enqueued.' });
 } catch (error) {
     // console.error(error);
