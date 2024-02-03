@@ -36,5 +36,5 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD /bin/start.sh
-# CMD [ "npm", "run", "start" ]
+# CMD /bin/start.sh
+CMD [ "npm run start", "ts-node summarizer.js" ]
