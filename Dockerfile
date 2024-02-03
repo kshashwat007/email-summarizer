@@ -34,7 +34,11 @@ FROM base
 # Copy built application
 COPY --from=build /app /app
 
+# Ensure start.sh is executable and in the correct location
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-# CMD /bin/start.sh
-CMD [ "npm run start", "ts-node summarizer.js" ]
+CMD ["sh", "start.sh"]
+# CMD [ "npm", "run", "start" ]
