@@ -66,16 +66,20 @@ async function summarizeEmail(emailBody, openaiKey, summaryLength) {
     })
 
     let prompt = `You will be provided with the body of an email. Your task is to analyze the content 
-and produce a summary. Specifically, you need to:
-1. **Summarize the Email:** Extract the main points and themes from the email content.
-2. **Extract Links:** Identify any URLs or web links included in the email body.
-3. **Identify Action Items:** Highlight any tasks, requests, or action items mentioned.
-3. Summary Length: The Summary Length should be ${summaryLength}
-The output should be formatted as a JSON object, with the following keys and corresponding information:
-- \`summary\`: A concise overview of the email's content.
-- \`links\`: A list of any URLs found in the email.
-- \`action_items\`: A list of tasks or actions that the recipient is expected to undertake.
-The JSON should be readable, without unnecessary escape characters or slashes, and should be structured for easy understanding.`
+    and produce a summary. Specifically, you need to:
+    1. **Summarize the Email:** Extract the main points and themes from the email content.
+    2. **Extract Links:** Identify any URLs or web links included in the email body.
+    3. **Identify Action Items:** Highlight any tasks, requests, or action items mentioned.
+    3. Summary Length: The Summary Length should be ${summaryLength}
+    The output should be formatted as a JSON object, with the following keys and corresponding information:
+    - \`summary\`: A concise overview of the email's content.
+    - \`links\`: A list of any URLs found in the email.
+    - \`action_items\`: A list of tasks or actions that the recipient is expected to undertake.
+    - \`sender\`: Key with no value.Empty to fill value later.
+    - \`subject\`: Key with no value.Empty to fill value later.
+    - \`date\`: Key with no value.Empty to fill value later.
+    - \`userID\`: Key with no value.Empty to fill value later.
+    The JSON should be readable, without unnecessary escape characters or slashes, and should be structured for easy understanding.`
 
     const completion = await openai.chat.completions.create({
       messages: [

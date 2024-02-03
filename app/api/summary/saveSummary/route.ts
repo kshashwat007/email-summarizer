@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
   try {
     await connectMongo();
     let data = await request.json()
+    console.log("data",data)
     await Summary.create(data)
     return Response.json({success:"Summary Saved"})
 } catch (error) {

@@ -12,18 +12,21 @@ import { createClient } from 'redis';
 // import { Redis } from '@upstash/redis'
 import {Redis} from "ioredis"
 export const dynamic = 'force-dynamic'
+import { Client } from "@upstash/qstash";
 
-// const redisConnection = new Redis("rediss://default:213e9fc9ae544a55b112da29ddbfc03a@eu2-related-treefrog-30277.upstash.io:30277",{maxRetriesPerRequest: null});
+const client = new Client({ token: "eyJVc2VySUQiOiIyNDQwZDBkNC0zMTczLTQ1ZmMtYThhMy0wMmE1ZGIxOWEzODQiLCJQYXNzd29yZCI6ImRhNzA4NTYxN2VhMjQ4ZmNiYTlkNTUzY2NkOWY2OGI5In0=" });
+
+const redisConnection = new Redis("rediss://default:213e9fc9ae544a55b112da29ddbfc03a@eu2-related-treefrog-30277.upstash.io:30277",{maxRetriesPerRequest: null});
 
 
 
-// const emailSummarizationQueue = new Queue('emailSummarizer', {
-//   connection: redisConnection,
-//   limiter: {
-//     max: 20,
-//     duration: 60000,
-//   }
-// });
+const emailSummarizationQueue = new Queue('emailSummarizer', {
+  connection: redisConnection,
+  limiter: {
+    max: 20,
+    duration: 60000,
+  }
+});
 
 async function authenticate(refreshToken: String) {
   const oAuth2Client = new google.auth.OAuth2(
@@ -85,6 +88,7 @@ async function fetchUnreadEmails(auth: any) {
   const response = await gmail.users.messages.list({
       userId: 'me',
       q: `is:unread after:${oneWeekAgo.toISOString().split('T')[0]}`,
+      maxResults: 1
   });
   // console.log("RES", response)
   const fullEmails = await Promise.all(response.data.messages.map((msg: { id: any; }) => getEmailContent(msg.id, auth)));
@@ -155,9 +159,6 @@ export async function GET(request: NextRequest) {
       const user = await User.findById(userObj._id);
       const auth = await authenticate(userObj.refreshToken);
       const emails = await fetchUnreadEmails(auth);
-      const userOpenAIToken = await User.findOne({ _id: userObj._id })
-        .select('openaiKey')
-        .exec()
       
       let openaiKey = process.env.OPENAI_API_KEY
       let enqueuedJobs = emails.map(async (email) => {
@@ -170,34 +171,17 @@ export async function GET(request: NextRequest) {
           "date": email.date,
           "summaryLength": user.summaryLength
         }
-        await fetch("https://qstash.upstash.io/v2/publish/https://summarize-worker.kshashwat007.workers.dev", {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json; charset=UTF-8', 'Authorization': `Bearer eyJVc2VySUQiOiIyNDQwZDBkNC0zMTczLTQ1ZmMtYThhMy0wMmE1ZGIxOWEzODQiLCJQYXNzd29yZCI6ImRhNzA4NTYxN2VhMjQ4ZmNiYTlkNTUzY2NkOWY2OGI5In0=`
-          },
-          body: JSON.stringify(summaryBody)
-        })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          console.log("Summary Sent")
-        })
-        .then(data => {
-          console.log("Summary Sent")
-        })
-        .catch(error => {
-          console.error('Error fetching data:', error);
-        });
-        // return await emailSummarizationQueue.add("emailSummarizerProd",{
-        //   userId: user._id,
-        //   emailContent: email.decodedBody,
-        //   sender: email.sender,
-        //   subject: email.subject,
-        //   date: email.date,
-        //   summaryLength: user.summaryLength
-        //   // openai: openai
-        // });
+        // console.log("Body", summaryBody)
+        // client.publishJSON({
+        //   url: "https://summarize-worker.kshashwat007.workers.dev",
+        //   body: summaryBody,
+        //   headers: {
+        //     'Content-type': 'application/json; charset=UTF-8', 'Authorization': `Bearer eyJVc2VySUQiOiIyNDQwZDBkNC0zMTczLTQ1ZmMtYThhMy0wMmE1ZGIxOWEzODQiLCJQYXNzd29yZCI6ImRhNzA4NTYxN2VhMjQ4ZmNiYTlkNTUzY2NkOWY2OGI5In0=`
+        //   },
+        //   delay: 10
+        // })
+        
+        return await emailSummarizationQueue.add("emailSummarizerProd",summaryBody);
       });
       await Promise.all(enqueuedJobs);
     });
