@@ -40,5 +40,5 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD ["./start.sh"]
-# CMD [ "npm", "run", "start" ]
+# CMD ["./start.sh"]
+CMD [ "npm", "run", "start" ]
