@@ -28,10 +28,6 @@ COPY --link . .
 # Build application
 RUN npm run build
 
-# Remove development dependencies
-RUN npm prune --omit=dev
-
-
 # Final stage for app image
 FROM base
 
@@ -40,5 +36,5 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-# CMD ["./start.sh"]
-CMD [ "npm", "run", "start" ]
+CMD /bin/start.sh
+# CMD [ "npm", "run", "start" ]
