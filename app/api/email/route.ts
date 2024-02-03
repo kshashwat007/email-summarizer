@@ -93,7 +93,6 @@ async function fetchUnreadEmails(auth: any) {
   const response = await gmail.users.messages.list({
       userId: 'me',
       q: `is:unread after:${oneWeekAgo.toISOString().split('T')[0]}`,
-      maxResults: 1
   });
   // console.log("RES", response)
   const fullEmails = await Promise.all(response.data.messages.map((msg: { id: any; }) => getEmailContent(msg.id, auth)));
