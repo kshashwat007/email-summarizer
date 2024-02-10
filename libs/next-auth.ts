@@ -24,7 +24,7 @@ export const authOptions: NextAuthOptionsExtended = {
         params: {
           access_type: 'offline',
           prompt: 'consent', // Force the consent screen to ensure a refresh token is returned
-          scope: "https://mail.google.com/ openid email profile",
+          scope: "https://www.googleapis.com/auth/gmail.readonly openid email profile",
         },
       },
       async profile(profile) {

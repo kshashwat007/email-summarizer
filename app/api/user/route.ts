@@ -13,14 +13,14 @@ export async function GET(request: NextRequest) {
   try {
     await connectMongo();
     const session = await getServerSession(authOptions);
-    console.log("Session", session)
     const user = await User.findById(session.user.id);
     if (user) {
       user.accessToken = session.user.accessToken
       user.refreshToken = session.user.refreshToken
       user.save()
     }
-    return Response.json({"Sucess": "User updated"})
+    console.log("user",user)
+    return Response.json({user: user})
 } catch (error) {
     console.error(error);
     return Response.json({error: error})

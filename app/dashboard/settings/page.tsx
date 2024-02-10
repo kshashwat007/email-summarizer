@@ -35,7 +35,7 @@ const page = () => {
     console.log("Data",data)
     console.log("ID", session.user.id)
     try {
-      fetch(`${config.env.domain}/api/user/updateUser?id=${session.user.id}`, {
+      fetch(`/api/user/updateUser?id=${session.user.id}`, {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(data)

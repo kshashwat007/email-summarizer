@@ -10,6 +10,11 @@ import Summary from '@/models/Summary';
 import connectMongo from '@/libs/mongoose';
 import ButtonAccount from '@/components/ButtonAccount';
 import config from '@/config';
+import Shepherd from 'shepherd.js';
+import 'shepherd.js/dist/css/shepherd.css';
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
+
 
 const EmailSummary = ({ email }) => {
   const router = useRouter();
@@ -103,41 +108,58 @@ const EmailSummary = ({ email }) => {
 
 const SummaryFeed = () => {
   const [summaries, setSummaries] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  
   useEffect(() => {
-    fetch(`/api/summaries`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Data", data.summaries)
-        setSummaries(data.summaries);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        setError(error);
-        setLoading(false);
-      });
-    fetch(`/api/user`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Data", data)
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+    Promise.all([
+      fetch(`/api/summaries`).then(res => res.json()),
+      fetch(`/api/user`).then(res => res.json())
+    ]).then(([summariesData, userData]) => {
+      setSummaries(summariesData.summaries);
+      setUser(userData.user)
+      setLoading(false)
+      // You can check here if the elements exist and then start the tour
+      // 1. Fetch user. 2. Check if first time. 3. Fetch limited amount of emails for the users to start off. 4. Once tour over, he wont be first time
+      console.log("User",userData.user)
+      if (userData.user != null && userData.user.firstTime == true) {
+        let data = {}
+        data["firstTime"] = false
+        startTour();
+        fetch(`/api/user/updateUser?id=${userData.user.id}`, {
+          method: 'PATCH',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(data)
+        })
+        fetch(`/api/email/firstTime?id=${userData.user.id}`)
+      }
+      
+    }).catch(error => {
+      setError(error)
+      console.error('There was an error!', error);
+    });
   }, []);
+  
+  const startTour = () => {
+    const driverObj = driver({
+      showProgress: true,
+      steps: [
+        { element: '.page-header', popover: { title: 'Welcome', description: `Welcome to Summailize, your personal email summarizer. We are here to help you declutter your inbox and save time. Let's get started` } },
+        { element: '.menu-settings', popover: { title: 'Summary Length', description: `You can choose how long you want your email summaries to be. Select your preferred summary length: [Short, Medium, Long].` } },
+        { element: '.user-account', popover: { title: 'User', description: 'This here is your logged in user. You can also logout from over here' } },
+        { element: '.menu-settings', popover: { title: 'Review Settings', description: 'Take a moment to review your settings.' } },
+        { element: '.page-header', popover: { title: 'Email Notification', description: 'Expect an notification everytime your summaries are ready. For now we will fetch a short amount of emails for you to start with in a short while.' } },
+        { element: '.page-header', popover: { title: 'Enjoy', description: 'You are all setup. Feel free to leave any feedback for this Beta. Many more features are planned out such as summaries delivered right to your mail, chrome extensions and many more exciting stuff. So stay tuned!' } }
+      ]
+    });
+    
+    driverObj.drive();
+  };
+  
+  // ... other component logic
+  
 
   if (loading) {
     return <div>Loading...</div>;
@@ -150,7 +172,7 @@ const SummaryFeed = () => {
   return (
     <div className="flex h-screen bg-[#F5F7FA]">
       <div className="flex-grow overflow-auto">
-        <div className='p-6'>
+        <div className='p-6 user-account'>
           <ButtonAccount />
         </div>
         
