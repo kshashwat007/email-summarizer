@@ -194,7 +194,7 @@ export async function GET(request: NextRequest) {
      }
       fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
-        headers: { 'content-type': 'application/json', 'accept': 'application/json', 'api-key': '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' },
+        headers: { 'content-type': 'application/json', 'accept': 'application/json', 'api-key': process.env.BREVO_KEY },
         body: JSON.stringify(emailData)
       })
       await Promise.all(enqueuedJobs);
