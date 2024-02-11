@@ -14,6 +14,7 @@ import Shepherd from 'shepherd.js';
 import 'shepherd.js/dist/css/shepherd.css';
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
+import Script from 'next/script';
 
 
 const EmailSummary = ({ email }) => {
@@ -171,6 +172,14 @@ const SummaryFeed = () => {
 
   return (
     <div className="flex h-screen bg-[#F5F7FA]">
+      <Script
+        id="feedback-widget-script"
+        src="https://25.tools/feedback-widget/widget.js"
+        strategy="afterInteractive"
+        data-token="7o5yztwnnsd"
+        async
+        defer
+      />
       <div className="flex-grow overflow-auto">
         <div className='p-6 user-account'>
           <ButtonAccount />
